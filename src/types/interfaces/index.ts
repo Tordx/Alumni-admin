@@ -15,6 +15,7 @@ export interface personaldata {
 
   uid: string,
   name: string,
+  fullname: name,
   birthdate: string,
   civilstatus: string,
   contactnumber: string,

@@ -62,7 +62,7 @@ export default function Login({}) {
     
     if (userData.length > 0) {
       settoast('verifying credentials...')
-      const isAdmin = userData.some((user) => user.type === "alumni");
+      const isAdmin = userData.some((user) => user.type === "admin");
       console.log(isAdmin);
       if (isAdmin) {
         const email = loginemail;
@@ -79,7 +79,7 @@ export default function Login({}) {
         }
         })
       } else {
-        settoast('The provided email used in a non-user account')
+        settoast('The provided email used in a non-admin account')
         seterror(true)
       }
     } else {

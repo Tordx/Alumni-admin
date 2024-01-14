@@ -4,7 +4,7 @@ import React, { useContext, useState } from 'react'
 import Card from 'screens/components/global/card'
 import { LoginFields, Select, TextField } from 'screens/components/global/fields'
 import { personaldata, postdata } from 'types/interfaces'
-import {addDoc, collection} from '@firebase/firestore'
+import {addDoc, collection, setDoc, doc} from '@firebase/firestore'
 import { auth, db, storage } from '../../firebase/index'
 import { generateRandomKey } from '../../firebase/function'
 import { uploadBytes, getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
@@ -26,6 +26,12 @@ function AddNewAccount({isModalVisible, visible, closeModal, type}: Props) {
 		const [form, setform] = useState<personaldata[]>(
 			[
 				{
+                    fullname: {
+                        firstname: '',
+                        middlename: '',
+                        lastname: '',
+                        suffix: '',
+                    },
 					uid: '',
                     name: '',
                     birthdate:  '',
@@ -42,23 +48,43 @@ function AddNewAccount({isModalVisible, visible, closeModal, type}: Props) {
 
 
 	const submit = async () => {
-    if (form[0].email !== '' || form[0].name !== '' || selectedschool !== '' || form[0].sex !== '') {
+    if (
+        form[0].email !== '' || 
+        form[0].fullname.firstname !== '' || 
+        form[0].fullname.middlename !== '' || 
+        form[0].fullname.lastname || 
+        selectedschool !== '' || 
+        form[0].sex !== '') {
 			const id = generateRandomKey(25);
-			const userRef = collection(db, 'user');
         try {
-            await createUserWithEmailAndPassword(auth, form[0].email, temppassword).then(async() => {
-                await addDoc(userRef, {
-                    uid: id,
-                    name: form[0].name,
+            await createUserWithEmailAndPassword(auth, form[0].email, temppassword).then(async(res) => {
+                
+			const userRef = doc(db, 'user', res.user.uid);
+                await setDoc(userRef, {
+                    uid: res.user.uid,
+                    fullname: {
+                        firstname: '',
+                        middlename: '',
+                        lastname: '',
+                        suffix: '',
+                    },
+                    name: form[0].fullname.firstname + form[0].fullname.middlename + form[0].fullname.lastname + form[0].fullname?.suffix,
                     email: form[0].email,
                     sex: form[0].sex,
                     school: selectedschool,
+                    type: 'alumni'
 
             });
                 alert(`Successfully added new account`);
                 setselectedschool('KNHS')
                 setform([
                     {
+                        fullname: {
+                            firstname: '',
+                            middlename: '',
+                            lastname: '',
+                            suffix: '',}
+                        ,
                         uid: '',
                         name: '',
                         birthdate:  '',
@@ -72,8 +98,10 @@ function AddNewAccount({isModalVisible, visible, closeModal, type}: Props) {
                     },
                 ]);
                 visible(false)
-            }).catch(() => {
-                alert('something went wrong')
+            }).catch((error: any) => {
+                console.log(error)
+                alert('something went wrong' + error)
+                
             })
          } catch (error) {
         console.error('Error adding post:', error);
@@ -109,18 +137,76 @@ function AddNewAccount({isModalVisible, visible, closeModal, type}: Props) {
 									icon={faChevronRight}
 								/>
 								<LoginFields 
-                                    title='Full Name'
+                                    title='First Name'
+                                    type  ='text'
+                                    icon = {faUser}
+                                    disabled = {false}
+                                    onChange={(e) => setform((prev) => [
+                                    {
+                                        ...prev[0],
+                                        fullname: {
+                                            ...prev[0].fullname,
+                                            firstname: e.target.value,
+                                        },
+                                        },
+                                    ])}
+                                    placeholder= 'first name' 
+                                    value= {form[0].fullname.firstname}
+
+                                />
+                                <LoginFields 
+                                    title='Middle Name'
+                                    type  ='text'
+                                    icon = {faUser}
+                                    disabled = {false}
+                                    onChange={(e) => setform((prev) => [
+                                    {
+                                        ...prev[0],
+                                        fullname: {
+                                            ...prev[0].fullname,
+                                            middlename: e.target.value,
+                                        },
+                                        },
+                                    ])}
+                                    placeholder= 'middle name' 
+                                    value= {form[0].fullname.middlename}
+                                    
+                                />
+                                <LoginFields 
+                                    title='Last Name'
                                     type  ='text'
                                     icon = {faUser}
                                     disabled = {false}
                                     onChange={(e) => setform((prev) => [
                                         {
-                                        ...prev[0],
-                                        name: e.target.value,
-                                        },
-                                    ])}
-                                    placeholder= 'first name, middle name, last name' 
-                                    value= {form[0].name} 
+                                            ...prev[0],
+                                            fullname: {
+                                                ...prev[0].fullname,
+                                                lastname: e.target.value,
+                                            },
+                                            },
+                                        ])}
+                                    placeholder= 'last name' 
+                                    value= {form[0].fullname.lastname}
+                                    
+                                />
+                                <LoginFields 
+                                    title='Suffix'
+                                    type  ='text'
+                                    icon = {faUser}
+                                    disabled = {false}
+                                    onChange={(e) => setform((prev) => [
+                                        {
+                                            ...prev[0],
+                                            fullname: {
+                                                ...prev[0].fullname,
+                                                suffix: e.target.value,
+                                            },
+                                            },
+                                        ])}
+                                    placeholder= 'suffix' 
+                                    value= {form[0].fullname.suffix}
+                                    
                                 />
                                 <LoginFields 
                                     title='Email Address*'

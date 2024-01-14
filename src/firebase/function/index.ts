@@ -44,6 +44,7 @@ export const fetchdata = async(data: string) => {
       querySnapshot.forEach((doc) => {
         if(doc.data().uid === uid)
         thisdata.push({
+          fullname: doc.data().fullname,
           uid: doc.data().uid,
           name: doc.data().name,
           birthdate: doc.data().birthdate,
@@ -211,6 +212,7 @@ export const fetchdata = async(data: string) => {
       const thisdata: personaldata[] = []
       querySnapshot.forEach((doc) => {
         thisdata.push({
+          fullname: doc.data().fullname,
           uid: doc.data().uid,
           name: doc.data().name,
           birthdate: doc.data().birthdate,

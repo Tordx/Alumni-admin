@@ -15,6 +15,12 @@ export default function Personal({}: Props) {
     const {currentUser} = React.useContext(AuthContext)
     const [form, setform] = React.useState<personaldata[]>([
       { 
+        fullname: {
+          firstname: '',
+          middlename: '',
+          lastname: '',
+          suffix: '',
+        },
         uid: '',
         name: '',
         birthdate: '',
@@ -36,7 +42,13 @@ export default function Personal({}: Props) {
 
     const fetchdata = async() => {
       const result: personaldata[] = await fetchpersonaldata(currentUser?.uid || '') || []
-        setform([{ 
+        setform([{
+          fullname: {
+            firstname: '',
+            middlename: '',
+            lastname: '',
+            suffix: '',
+         },
           uid: result[0].uid,
           name: result[0].name,
           birthdate: result[0].birthdate,
@@ -75,6 +87,12 @@ export default function Personal({}: Props) {
               alert('Personal Information succesfully updated')
               setform([
                 { 
+                  fullname: {
+                    firstname: '',
+                    middlename: '',
+                    lastname: '',
+                    suffix: '',
+                  },
                   uid: form[0].uid,
                   name: form[0].name,
                   birthdate: form[0].birthdate,
