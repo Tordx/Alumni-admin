@@ -104,7 +104,7 @@ export default function Login({}) {
             <img className='logo' src ='https://i.imgur.com/4ywrjZF.png' />
             <img className='logo'  src='https://i.imgur.com/5CH306W.png'/>
           </span>
-          <h1>Login to your Account</h1>
+          <h1>Admin Login</h1>
           <LoginFields 
             title = 'email address'
             icon = {faUser}
