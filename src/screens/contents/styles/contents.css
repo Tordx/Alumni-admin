@@ -158,3 +158,11 @@
 .table-itself p {
     color: #2F5288;
 }
+
+.floating-edit {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    top: 20px;
+    left: 100px;
+}

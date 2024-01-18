@@ -20,7 +20,7 @@ export const fetchdata = async(data: string) => {
       if(doc.data().active === true)
       thisdata.push({
         uid: doc.data().uid,
-        id: doc.data().postid,
+        id: doc.data().id,
         time: doc.data().time,
         photo: doc.data().photo,
         text: doc.data().text,

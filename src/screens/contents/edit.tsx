@@ -4,36 +4,34 @@ import React, { useContext, useState } from 'react'
 import Card from 'screens/components/global/card'
 import { LoginFields, Select, TextField } from 'screens/components/global/fields'
 import { postdata } from 'types/interfaces'
-import {addDoc, collection, doc, setDoc} from '@firebase/firestore'
+import {addDoc, collection, updateDoc, doc} from '@firebase/firestore'
 import { db, storage } from '../../firebase/index'
 import { generateRandomKey } from '../../firebase/function'
 import { uploadBytes, getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 type Props = {
 		closeModal: (e: any) => void,
-    isModalVisible: boolean,
-		visible: (e: any) => void,
-		type: string,
+        rawdata: postdata,
 		callback: () => void
-		setVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 
 
-function Post({isModalVisible, visible, closeModal, type, callback, setVisible}: Props) {
+function Edit({rawdata, closeModal, callback}: Props) {
 
+        const data = rawdata;
 		const {currentUser} = useContext(AuthContext)
 		const [form, setform] = useState<postdata[]>(
 			[
 				{
-					id: '',
-					uid: currentUser?.uid || '',
+					id: data.id,
+					uid: data.uid,
 					time: new Date(),
-					photo: [],
-					text: '',
-					active: true,
-					type: '',
-					school: 'KNHS'
+					photo: data.photo,
+					text: data.text,
+					active: data.active,
+					type: data.type,
+					school: data.school,
 				}
 			]
 		);
@@ -41,66 +39,63 @@ function Post({isModalVisible, visible, closeModal, type, callback, setVisible}:
 
 	const submit = async () => {
     if (form[0].text !== '') {
+		console.log(form[0].id)
       try {
 			const id = generateRandomKey(25);
-			const formRef = doc(db, 'post', id);
-			const storageRef = ref(storage, 'images/' + form[0].photo.name);
-       if(form[0].photo != null){
-				await uploadBytes(storageRef, form[0].photo);
-    			const imageUrl = await getDownloadURL(storageRef);
-							await setDoc(formRef, {
-								id: id,
+			const postId = form[0].id || id; // Use form[0].id if available, otherwise generate a new ID
+
+			const formRef = doc(db, 'post', postId);
+			console.log(formRef)
+       if(form[0].photo != ''){
+				const formData = new FormData();
+					formData.append("image", form[0].photo); 
+					const myHeaders = new Headers();
+					myHeaders.append("Authorization", "Client-ID 5bfea368cb77e30"); 
+
+					const requestOptions: any = {
+							method: 'POST',
+							headers: myHeaders,
+							body: formData,
+							redirect: 'follow'
+					};
+					try {
+						const response = await fetch("https://api.imgur.com/3/image", requestOptions);
+						const result = await response.json();
+						if(!result.success) {
+							alert('Something went wrong while uploading image, do not include image yet.')
+							return
+						}
+						console.log(result);
+							await updateDoc(formRef, {
+								id: form[0].photo,
 								uid: form[0].uid,
 								time: form[0].time,
-								photo: imageUrl,
+								photo: result?.url || null,
 								text: form[0].text,
 								active: true,
-								type: type,
+								type: form[0].type,
 								school: form[0].school,
 						});
-						alert(`Successfully added ${type} post`);
-						setform([
-							{
-								id: '',
-								uid: currentUser?.uid || '',
-								time: new Date(),
-								photo: null,
-								text: '',
-								active: true,
-								type: '',
-								school: 'KNHS',
-							},
-						]);
-				callback()
-				setVisible(false)
+						alert(`Successfully edited post`);
+						callback()
+					} catch (error) {
+							console.error('Error uploading image to Imgur:', error);
+					}
 			} else {
-        	await setDoc(formRef, {
-						id: id,
+        await updateDoc(formRef, {
+						id: form[0].id,
 						uid: form[0].uid,
 						time: form[0].time,
 						photo: '',
 						text: form[0].text,
 						active: true,
-						type: type,
+						type: form[0].type,
 						school: form[0].school,
 				});
 
-					alert(`Successfully added ${type} post`);
-					setform([
-						{
-							id: '',
-							uid: currentUser?.uid || '',
-							time: new Date(),
-							photo: null,
-							text: '',
-							active: true,
-							type: '',
-							school: 'KNHS',
-						},
-					]);
+					alert(`Successfully edited post`);
+					callback()
 				}
-				callback()
-				setVisible(false)
       } catch (error) {
         console.error('Error adding post:', error);
         // Handle the error appropriately
@@ -110,32 +105,12 @@ function Post({isModalVisible, visible, closeModal, type, callback, setVisible}:
     }
   };
 
-    if(!isModalVisible){
         return (
-					<button className='post-button' onClick={visible}>Create Post</button>
-        )
-    } else {
-
-        return (
-            <div className='post-modal'>
+			<div className="modal-overlay" >
 							<Card className='form-wrapper post'>
 								<div className='form-container'>
-								<h1>Create Post</h1>
-								<Select
-									placeholder='Select a school'
-									value={form[0].school}
-									onChange={(e) => {
-										console.log(e.target.value)
-										setform((prev) => [
-									{
-										...prev[0],
-										school: e.target.value
-									},
-									])}}
-									selection={['KNHS', 'SCNHS']}
-									title = 'Select School'
-									icon={faChevronRight}
-								/>
+								<h1>Edit Post</h1>
+								
 								<LoginFields
 									type='file'
 									title='Upload a photo'
@@ -155,11 +130,11 @@ function Post({isModalVisible, visible, closeModal, type, callback, setVisible}:
 								/>
 								{form[0]?.photo != '' && (
 									<>
-									<p>Selected file: {form[0]?.photo?.name}</p>
+									<p>Selected file: {form[0]?.photo.name}</p>
 									<a style = {{color: 'red'}}onClick={() => setform((prev) => [
 												{
 													...prev[0],
-													photo: '',
+													photo: null,
 												},
 												])}>X</a>
 									</>
@@ -193,7 +168,6 @@ function Post({isModalVisible, visible, closeModal, type, callback, setVisible}:
 						</Card>
 						</div>
         )
-    }
 }
 
-export default Post
+export default Edit

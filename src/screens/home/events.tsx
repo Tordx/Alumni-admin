@@ -16,16 +16,16 @@ export default function Events({}: Props) {
   const schools = ['KNHS', 'SCNHS']
 
   React.useEffect(() => {
-    const getdata = async() => {
-      setloading(true)
-      const result: postdata[] = await fetchdata('post') || [];
-      const filterResult = result.filter((item) => item.type == 'events' && item.active === true && item.school === selectedschool)
-      setdata(filterResult)
-      setloading(false)
-    }
+   
     getdata()
   },[selectedschool])
-
+  const getdata = async() => {
+    setloading(true)
+    const result: postdata[] = await fetchdata('post') || [];
+    const filterResult = result.filter((item) => item.type == 'events' && item.active === true && item.school === selectedschool)
+    setdata(filterResult)
+    setloading(false)
+  }
   const selectSchool = (item: string) => {
     setselectedschool(item)
   }
@@ -44,15 +44,18 @@ export default function Events({}: Props) {
               key={index}>{item} </a>
           )}
         </div>
-        {data ? data.map((item, index) => (<Data data = {item} />)): <CircularProgress />}
+        {data ? data.map((item, index) => (<Data callback={getdata} data = {item} />)): <CircularProgress />}
         </div>
       </div>
       {!loading ? 
         <Post
           type = 'events'
+          callback={getdata}
           isModalVisible = {visible} 
           visible={() => setvisible(true)} 
-          closeModal={() => setvisible(false)} />
+          closeModal={() => setvisible(false)} 
+          setVisible = {setvisible}
+          />
       :
       <CircularProgress />
       }     
