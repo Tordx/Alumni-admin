@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { TableButton } from 'screens/components/global/buttons';
 import Card from 'screens/components/global/card';
 import { LoginFields } from 'screens/components/global/fields';
-import { educationdata, employmentdata, id, personaldata } from '../../types/interfaces';
+import { educationdata, employmentdata, id, idprocessed, personaldata } from '../../types/interfaces';
 
 type Props = {
   onClick: (e: any) => void
@@ -15,7 +15,7 @@ function TableButtons({onClick}: Props) {
   const [personal, setPersonal] = React.useState<personaldata[]>([]);
   const [education, setEducation] = React.useState<educationdata[]>([]);
   const [employment, setEmployment] = React.useState<employmentdata[]>([]);
-  const [update, setUpdate] = React.useState<id[]>([]);
+  const [update, setUpdate] = React.useState<idprocessed[]>([]);
   const [uidToFullNameMap, setUidToFullNameMap] = React.useState<Record<string, string>>({});
 
   React.useEffect(() => {
@@ -30,7 +30,30 @@ function TableButtons({onClick}: Props) {
         const employmentResult: employmentdata[] = await fetchallemployment() || [];
         setEmployment(employmentResult);
         const updateResult: id[] = await fetchupdate() || [];
-
+        
+        const processedUpdate = updateResult.map(item => {
+          // Convert the timestamp to a JavaScript Date object
+          const timestampInSeconds = item.date.seconds;
+          const timestampInMilliseconds = timestampInSeconds * 1000; // Convert seconds to milliseconds
+          const dateObject = new Date(timestampInMilliseconds);
+        
+          // Format the date as MM-DD-YYYY
+          const formattedDate = dateObject.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          });
+        
+          // Update the item with the formatted date
+          return {
+            ...item,
+            formattedDate: formattedDate,
+          };
+        });
+        
+        console.log(processedUpdate)
+        const updateWithoutDate = processedUpdate.map(({ date, ...rest }) => rest);
+setUpdate(updateWithoutDate);
         const uidMap: Record<string, string> = {};
         personalResult.forEach((person) => {
           uidMap[person.uid] = person.name;
@@ -139,7 +162,7 @@ function TableButtons({onClick}: Props) {
         openTable(updateDataWithFullName, 
           [
             { name: 'Full Name', id: 'fullname' }, 
-            { name: 'Date', id: 'employee' },
+            { name: 'Date', id: 'formattedDate' },
           ],
           'Alumni Updated Profiles'
           );

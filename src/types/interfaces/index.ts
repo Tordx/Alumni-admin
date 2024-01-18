@@ -113,7 +113,16 @@ export interface postdata {
 export interface id {
   uid: string,
   update: string,
-  date: string
+  date: {
+    seconds: number;
+    nanoseconds: number;
+  }
+}
+
+export interface idprocessed {
+  uid: string,
+  update: string,
+  formattedDate: string,
 }
 
 export interface admindata {
