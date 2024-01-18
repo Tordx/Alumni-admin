@@ -130,7 +130,7 @@ function Edit({rawdata, closeModal, callback}: Props) {
 								/>
 								{form[0]?.photo != '' && (
 									<>
-									<p>Selected file: {form[0]?.photo.name}</p>
+									<p>Selected file: {form[0]?.photo?.name}</p>
 									<a style = {{color: 'red'}}onClick={() => setform((prev) => [
 												{
 													...prev[0],
