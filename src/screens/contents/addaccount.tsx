@@ -9,20 +9,25 @@ import { auth, db, storage } from '../../firebase/index'
 import { generateRandomKey } from '../../firebase/function'
 import { uploadBytes, getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import {createUserWithEmailAndPassword} from 'firebase/auth'
+import Papa from 'papaparse';
+
 type Props = {
 		closeModal: (e: any) => void,
-    isModalVisible: boolean,
+        isModalVisible: boolean,
 		visible: (e: any) => void,
 		type: string,
+        callback: (e: string) => void
 }
 
 
 
-function AddNewAccount({isModalVisible, visible, closeModal, type}: Props) {
+function AddNewAccount({isModalVisible, visible, closeModal, type, callback}: Props) {
 
 		const {currentUser} = useContext(AuthContext);
         const [selectedschool, setselectedschool] = useState('');
+        const [loading, setloading] = useState(false)
         const [temppassword] = useState('summer@1234')
+        const [csvFile, setCsvFile] = useState<any>(null);
 		const [form, setform] = useState<personaldata[]>(
 			[
 				{
@@ -46,6 +51,88 @@ function AddNewAccount({isModalVisible, visible, closeModal, type}: Props) {
 			]
 		);
 
+        const handleCsvFileChange = (e: any) => {
+            if (e.target.files.length > 0) {
+              setCsvFile(e.target.files[0]);
+            } else {
+              setCsvFile(null);
+            }
+          };
+
+          const handleUploadButtonClick = async () => {
+            try {
+              const csvData: any = await new Promise((resolve) => {
+                Papa.parse(csvFile, {
+                  complete: (result) => resolve(result.data),
+                  header: true,
+                });
+              });
+          
+              if (csvData.length === 0) {
+                alert('CSV File empty');
+                return;
+              }
+          
+              console.log(csvData);
+              callback('wtf');
+              setloading(true)
+              let completedIterations = 0;
+              console.log(completedIterations)
+
+              for (const row of csvData) {
+                try {
+                  const { email, firstname, middlename, lastname, suffix, sex, school, idnumber } = row;
+          
+                  const userCredential = await createUserWithEmailAndPassword(auth, email, idnumber + lastname);
+                  const userId = userCredential.user.uid;
+          
+                  const userRef = doc(db, 'user', userId);
+          
+                  await setDoc(userRef, {
+                    uid: userId,
+                    fullname: {
+                      firstname: firstname,
+                      middlename: middlename,
+                      lastname: lastname,
+                      suffix: suffix,
+                    },
+                    schoolid: idnumber,
+                    name: firstname + ' ' + middlename + ' ' + lastname + ' ' + suffix,
+                    email: email,
+                    sex: sex,
+                    school: school,
+                    type: 'alumni',
+                  });
+          
+                  console.log(`Account created for ${email}`);
+                  if (completedIterations !== csvData.length) {
+                    console.log('bullshit right?');
+                    console.log(completedIterations)
+                    setloading(true)
+                    callback('wtf');
+                  }
+                callback('wtf');
+                setloading(true)
+                completedIterations++;
+                } catch (error) {
+                  console.error('Error creating account:', error);
+                  // Handle the error appropriately
+                }
+              }
+          
+              if (completedIterations === csvData.length) {
+                console.log('All accounts created successfully');
+                console.log('depungal')
+                setloading(false)
+                callback('uto');
+              }
+            } catch (error) {
+              console.error('Error processing CSV file:', error);
+              // Handle the error appropriately
+            } finally {
+            }
+          };
+          
 
 	const submit = async () => {
     if (
@@ -63,10 +150,10 @@ function AddNewAccount({isModalVisible, visible, closeModal, type}: Props) {
                 await setDoc(userRef, {
                     uid: res.user.uid,
                     fullname: {
-                        firstname: '',
-                        middlename: '',
-                        lastname: '',
-                        suffix: '',
+                        firstname: form[0].fullname.firstname,
+                        middlename: form[0].fullname.middlename,
+                        lastname: form[0].fullname.lastname,
+                        suffix: form[0].fullname.suffix,
                     },
                     name: form[0].fullname.firstname + form[0].fullname.middlename + form[0].fullname.lastname + form[0].fullname?.suffix,
                     email: form[0].email,
@@ -113,7 +200,13 @@ function AddNewAccount({isModalVisible, visible, closeModal, type}: Props) {
   };
 
     if(!isModalVisible){
-        return
+        if(loading) {
+            return (
+                <div className='post-modal'>uploading</div>
+            )
+        } else {
+            return
+        }
     } else {
 
         return (
@@ -121,6 +214,18 @@ function AddNewAccount({isModalVisible, visible, closeModal, type}: Props) {
 							<Card className='form-wrapper post'>
 								<div className='form-container'>
 								<h1>Add New account</h1>
+                                <input
+                                    type='file'
+                                    accept='.csv'
+                                    onChange={handleCsvFileChange}
+                                    style={{ marginTop: '20px' }}
+                                />
+                                
+                                {csvFile && (
+                                    <button onClick={handleUploadButtonClick} style={{ marginTop: '20px' }}>
+                                    Upload CSV and Create Accounts
+                                    </button>
+                                )}
 								<Select
 									placeholder='Select a school'
 									value={selectedschool}
@@ -257,6 +362,7 @@ function AddNewAccount({isModalVisible, visible, closeModal, type}: Props) {
 										<br/>
 								</div>
 						</Card>
+                        
 						</div>
         )
     }

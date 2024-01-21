@@ -18,6 +18,8 @@ interface general {
 }
 
 export const Analytics = (props: Props) => {
+
+    const [uploading, setuploading] = useState(false);
     const [visible, setvisible] = useState<boolean>(false)
     const [employed, setemployed] = useState<employmentdata[]>([]);
     const [unemployed, setunemployed] = useState<employmentdata[]>([])
@@ -34,6 +36,16 @@ export const Analytics = (props: Props) => {
     const [nohighered, setnohighered] = useState<educationdata[]>([])
     const [na, setna] = useState<number>(0)
     const [updates, setupdates] = useState<id[]>([])
+
+    const uploadingdata = (value: string) => {
+      console.log('update?')
+      if(value == 'wtf') {
+        setuploading(true)
+      }
+      if(value == 'uto') {
+        setuploading(false)
+      }
+    }
     React.useEffect(() => {
         const getdata = async() => {
           const result: employmentdata[] = await fetchsalary() || [];
@@ -51,7 +63,7 @@ export const Analytics = (props: Props) => {
 
           const single = personalresult.filter((item) => item.civilstatus === 'Single')
           const married = personalresult.filter(item => item.civilstatus === 'Married')
-          const widow = personalresult.filter(item => item.civilstatus === 'W idow')
+          const widow = personalresult.filter(item => item.civilstatus === 'Widow')
           setsingle(single.length)
           setmarried(married.length)
           setwidow(widow.length)          
@@ -83,7 +95,9 @@ export const Analytics = (props: Props) => {
         getdata()
       },[])
 
-  return (
+if(uploading){return (
+  <div className='post-modal'>uploading</div>
+)} else { return (
     <div className='container'>
     <img draggable = {false} src="https://i.imgur.com/mzylrqX.png" alt="Your Image"/>
   <div className="image-overlay">
@@ -139,7 +153,8 @@ export const Analytics = (props: Props) => {
           type = 'activities'
           isModalVisible = {visible} 
           visible={() => setvisible(true)} 
-          closeModal={() => setvisible(false)} />
+          closeModal={() => setvisible(false)}
+          callback={(value) => uploadingdata(value)} />
 </div>
-  )
+  )}
 }
