@@ -25,6 +25,7 @@ function AddNewAccount({isModalVisible, visible, closeModal, type, callback}: Pr
 
 		const {currentUser} = useContext(AuthContext);
         const [selectedschool, setselectedschool] = useState('');
+        const [schoolid, setschoolid] = useState('');
         const [loading, setloading] = useState(false)
         const [temppassword] = useState('summer@1234')
         const [csvFile, setCsvFile] = useState<any>(null);
@@ -96,9 +97,10 @@ function AddNewAccount({isModalVisible, visible, closeModal, type, callback}: Pr
                       lastname: lastname,
                       suffix: suffix,
                     },
+                    username: lastname + idnumber,
                     schoolid: idnumber,
                     name: firstname + ' ' + middlename + ' ' + lastname + ' ' + suffix,
-                    email: email,
+                    email: email || lastname + idnumber + '@' + lastname + idnumber + '.qwe',
                     sex: sex,
                     school: school,
                     type: 'alumni',
@@ -155,6 +157,7 @@ function AddNewAccount({isModalVisible, visible, closeModal, type, callback}: Pr
                         lastname: form[0].fullname.lastname,
                         suffix: form[0].fullname.suffix,
                     },
+                    username: form[0].fullname.lastname + schoolid,
                     name: form[0].fullname.firstname + form[0].fullname.middlename + form[0].fullname.lastname + form[0].fullname?.suffix,
                     email: form[0].email,
                     sex: form[0].sex,
@@ -342,6 +345,15 @@ function AddNewAccount({isModalVisible, visible, closeModal, type, callback}: Pr
 									title = 'Select Gender'
 									icon={faChevronRight}
 								/>
+                                <LoginFields 
+                                    title='School id*'
+                                    type  ='text'
+                                    icon = {faEnvelope}
+                                    disabled = {false}
+                                    onChange={(e) => setschoolid(e.target.value)}
+                                    placeholder= 'school id' 
+                                    value= {form[0].email} 
+                                />
                                 <LoginFields 
                                     title='Temporary Password'
                                     type  ='text'
