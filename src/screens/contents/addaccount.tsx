@@ -138,7 +138,6 @@ function AddNewAccount({isModalVisible, visible, closeModal, type, callback}: Pr
 
 	const submit = async () => {
     if (
-        form[0].email !== '' || 
         form[0].fullname.firstname !== '' || 
         form[0].fullname.middlename !== '' || 
         form[0].fullname.lastname || 
@@ -159,7 +158,7 @@ function AddNewAccount({isModalVisible, visible, closeModal, type, callback}: Pr
                     },
                     username: form[0].fullname.lastname + schoolid,
                     name: form[0].fullname.firstname + form[0].fullname.middlename + form[0].fullname.lastname + form[0].fullname?.suffix,
-                    email: form[0].email,
+                    email: form[0].email || form[0].fullname.lastname + schoolid + '@' + form[0].fullname.lastname + schoolid + '.qwe',
                     sex: form[0].sex,
                     school: selectedschool,
                     type: 'alumni'
