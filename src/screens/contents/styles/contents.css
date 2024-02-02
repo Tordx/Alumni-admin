@@ -140,11 +140,44 @@
 .table {
     background-color: white;
     width: 95%;
+    flex-direction: column;
 }
 
 .table-itself {
     padding: 15px 10px;
+   
 }
+.search-bar {
+    margin-bottom: 10px;
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  
+  .search-bar input {
+    padding: 10px 30px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+    font-size: 14px;
+    align-self: flex-start;
+  }
+  
+  .search-bar input::placeholder {
+    color: #999;
+  }
+  
+  .search-icon {
+    font-size: 16px;
+    color: #555;
+    position: absolute;
+    right: 30px;
+    transform: translateY(-0%);
+  }
+  .table {
+    width: 100%;
+  }
 
 .table-itself h1 {
     font-weight: 500;
@@ -165,4 +198,8 @@
     flex-direction: row;
     top: 20px;
     left: 100px;
+}
+
+.print-dl {
+    cursor: pointer;
 }

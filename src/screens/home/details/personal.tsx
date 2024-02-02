@@ -31,6 +31,7 @@ export default function Personal({}: Props) {
         age: '',
         sex: '',
         address: '',
+        sy: '',
       }
     ])
 
@@ -59,6 +60,7 @@ export default function Personal({}: Props) {
           address: result[0].address,
           sex: result[0].sex,
           age: result[0].age,
+          sy: form[0].sy,
         }])
     }
 
@@ -103,6 +105,7 @@ export default function Personal({}: Props) {
                   age: form[0].age,
                   sex: form[0].sex,
                   address: form[0].address,
+                  sy: form[0].sy,
                 }
               ])
             fetchdata()

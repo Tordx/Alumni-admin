@@ -50,7 +50,7 @@ export default function News({}: Props) {
         {data ? data.map((item, index) => (<Data callback = {getdata} data = {item} />)): <CircularProgress />}
         </div>
       </div>
-      {!loading ? 
+      {!loading && 
         <Post
           type = 'news'
           callback={getdata}
@@ -59,8 +59,6 @@ export default function News({}: Props) {
           closeModal={() => setvisible(false)} 
           setVisible = {setvisible}
           />
-      :
-      <CircularProgress />
       }     
   </div>
   )

@@ -24,6 +24,7 @@ export interface personaldata {
   age: string,
   sex: string,
   address: string,
+  sy: string,
 
 }
 

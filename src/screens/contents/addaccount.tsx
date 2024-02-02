@@ -48,6 +48,7 @@ function AddNewAccount({isModalVisible, visible, closeModal, type, callback}: Pr
                     age:  '',
                     sex:  '',
                     address:  '',
+                    sy: '',
 				}
 			]
 		);
@@ -106,8 +107,8 @@ function AddNewAccount({isModalVisible, visible, closeModal, type, callback}: Pr
                     type: 'alumni',
                   });
           
-                  console.log(`Account created for ${email}`);
-                  if (completedIterations !== csvData.length) {
+                    console.log(`Account created for ${email}`);
+                    if (completedIterations !== csvData.length) {
                     console.log('bullshit right?');
                     console.log(completedIterations)
                     setloading(true)
@@ -184,6 +185,7 @@ function AddNewAccount({isModalVisible, visible, closeModal, type, callback}: Pr
                         age:  '',
                         sex:  '',
                         address:  '',
+                        sy: '',
                     },
                 ]);
                 visible(false)

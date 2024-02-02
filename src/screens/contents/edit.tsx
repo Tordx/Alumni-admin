@@ -8,6 +8,7 @@ import {addDoc, collection, updateDoc, doc} from '@firebase/firestore'
 import { db, storage } from '../../firebase/index'
 import { generateRandomKey } from '../../firebase/function'
 import { uploadBytes, getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import Modal from 'screens/components/global/modal'
 
 type Props = {
 		closeModal: (e: any) => void,
@@ -20,6 +21,10 @@ type Props = {
 function Edit({rawdata, closeModal, callback}: Props) {
 
         const data = rawdata;
+		console.log(data)
+		const [modalOpen, setModalOpen] = useState(false)
+		const openModal = () => setModalOpen(true);
+		const closeModalImage = () => setModalOpen(false);
 		const {currentUser} = useContext(AuthContext)
 		const [form, setform] = useState<postdata[]>(
 			[
@@ -37,74 +42,72 @@ function Edit({rawdata, closeModal, callback}: Props) {
 		);
 
 
-	const submit = async () => {
-    if (form[0].text !== '') {
-		console.log(form[0].id)
-      try {
-			const id = generateRandomKey(25);
-			const postId = form[0].id || id; // Use form[0].id if available, otherwise generate a new ID
-
-			const formRef = doc(db, 'post', postId);
-			console.log(formRef)
-       if(form[0].photo != ''){
-				const formData = new FormData();
-					formData.append("image", form[0].photo); 
-					const myHeaders = new Headers();
-					myHeaders.append("Authorization", "Client-ID 5bfea368cb77e30"); 
-
-					const requestOptions: any = {
-							method: 'POST',
-							headers: myHeaders,
-							body: formData,
-							redirect: 'follow'
-					};
-					try {
-						const response = await fetch("https://api.imgur.com/3/image", requestOptions);
-						const result = await response.json();
-						if(!result.success) {
-							alert('Something went wrong while uploading image, do not include image yet.')
-							return
-						}
-						console.log(result);
-							await updateDoc(formRef, {
-								id: form[0].photo,
+		const submit = async () => {
+			if (form[0].text !== '') {
+			  try {
+					const id = generateRandomKey(25);
+					const formRef = doc(db, 'post', form[0].id);
+					const storageRef = ref(storage, 'images/' + form[0].photo.name);
+			   if(form[0].photo != ''){
+						await uploadBytes(storageRef, form[0].photo);
+						const imageUrl = await getDownloadURL(storageRef);
+									await updateDoc(formRef, {
+										id: form[0].id,
+										uid: form[0].uid,
+										time: form[0].time,
+										photo: imageUrl,
+										text: form[0].text,
+										active: true,
+										school: form[0].school,
+								});
+								alert(`Successfully edited post`);
+								setform([
+									{
+										id: '',
+										uid: currentUser?.uid || '',
+										time: new Date(),
+										photo: null,
+										text: '',
+										active: true,
+										type: '',
+										school: 'KNHS',
+									},
+								]);
+						callback()
+					} else {
+					await updateDoc(formRef, {
+								id: form[0].id,
 								uid: form[0].uid,
 								time: form[0].time,
-								photo: result?.url || null,
+								photo: '',
+								text: form[0].text,
+								active: true,
+								school: form[0].school,
+						});
+		
+							alert(`Successfully edited post`);
+							setform([
+								{
+								id: id,
+								uid: form[0].uid,
+								time: form[0].time,
+								photo: form[0].photo,
 								text: form[0].text,
 								active: true,
 								type: form[0].type,
 								school: form[0].school,
-						});
-						alert(`Successfully edited post`);
+								},
+							]);
+						}
 						callback()
-					} catch (error) {
-							console.error('Error uploading image to Imgur:', error);
-					}
+			  } catch (error) {
+				console.error('Error adding post:', error);
+				// Handle the error appropriately
+			  }
 			} else {
-        await updateDoc(formRef, {
-						id: form[0].id,
-						uid: form[0].uid,
-						time: form[0].time,
-						photo: '',
-						text: form[0].text,
-						active: true,
-						type: form[0].type,
-						school: form[0].school,
-				});
-
-					alert(`Successfully edited post`);
-					callback()
-				}
-      } catch (error) {
-        console.error('Error adding post:', error);
-        // Handle the error appropriately
-      }
-    } else {
-      alert("You can't post without a description");
-    }
-  };
-
+			  alert("You can't post without a description");
+			}
+		  };
         return (
 			<div className="modal-overlay" >
 							<Card className='form-wrapper post'>
@@ -118,6 +121,8 @@ function Edit({rawdata, closeModal, callback}: Props) {
 									value= {''}
 									onChange={(e) => {
 										const file = e.target.files[0]
+
+										console.log(file)
 										setform((prev) => [
 									{
 										...prev[0],
@@ -130,11 +135,11 @@ function Edit({rawdata, closeModal, callback}: Props) {
 								/>
 								{form[0]?.photo != '' && (
 									<>
-									<p>Selected file: {form[0]?.photo?.name}</p>
+									{typeof form[0]?.photo === 'string' ? <p onClick={openModal}>View photo</p> : <p>{form[0].photo?.name}</p>}
 									<a style = {{color: 'red'}}onClick={() => setform((prev) => [
 												{
 													...prev[0],
-													photo: null,
+													photo: '',
 												},
 												])}>X</a>
 									</>
@@ -166,6 +171,8 @@ function Edit({rawdata, closeModal, callback}: Props) {
 								</div>
 								
 						</Card>
+						<Modal  isOpen={modalOpen} onClose={closeModalImage} imageSrc={form[0].photo?.name || form[0].photo}/>
+
 						</div>
         )
 }

@@ -55,6 +55,7 @@ export const fetchdata = async(data: string) => {
           age: doc.data().age,
           sex: doc.data().sex,
           address: doc.data().address,
+          sy: doc.data().sy,
         })
       })
   
@@ -169,7 +170,7 @@ export const fetchdata = async(data: string) => {
           employee: doc.data().employee,
           currentwork: doc.data().current,
           salary: doc.data().salary,
-          history: doc.data().uid, 
+          history: doc.data().history, 
         })
       })
       return thisdata
@@ -223,6 +224,7 @@ export const fetchdata = async(data: string) => {
           age: doc.data().age,
           sex: doc.data().sex,
           address: doc.data().address,
+          sy: doc.data().sy,
         })
       })
   

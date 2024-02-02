@@ -47,7 +47,7 @@ export default function Events({}: Props) {
         {data ? data.map((item, index) => (<Data callback={getdata} data = {item} />)): <CircularProgress />}
         </div>
       </div>
-      {!loading ? 
+      {!loading &&
         <Post
           type = 'events'
           callback={getdata}
@@ -56,8 +56,6 @@ export default function Events({}: Props) {
           closeModal={() => setvisible(false)} 
           setVisible = {setvisible}
           />
-      :
-      <CircularProgress />
       }     
   </div>
   )

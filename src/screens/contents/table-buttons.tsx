@@ -53,7 +53,7 @@ function TableButtons({onClick}: Props) {
         
         console.log(processedUpdate)
         const updateWithoutDate = processedUpdate.map(({ date, ...rest }) => rest);
-setUpdate(updateWithoutDate);
+        setUpdate(updateWithoutDate);
         const uidMap: Record<string, string> = {};
         personalResult.forEach((person) => {
           uidMap[person.uid] = person.name;
@@ -114,6 +114,7 @@ setUpdate(updateWithoutDate);
               { name: 'Age', id: 'age' },
               { name: 'Gender', id: 'sex' },
               { name: 'Address', id: 'address' },
+              { name: 'Batch', id: 'sy' },
             ],
             'Alumni Personal Details'
           )
@@ -149,7 +150,7 @@ setUpdate(updateWithoutDate);
               { name: 'Employed', id: 'employee' },
               { name: 'Current Work', id: 'currentwork' },
               { name: 'Salary Range', id: 'salary' },
-              { name: 'Work History', id: 'history' },  
+              { name: 'Work History', id: 'history.work' },  
             ],
             'Alumni Employment Details'
             );

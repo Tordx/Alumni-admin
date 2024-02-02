@@ -81,14 +81,9 @@ export const Header: React.FC<Props> = ({menu}) => {
       </div>
       {dropdownVisible && (
         <div className="dropdown-menu">
-          <p>{user[0]?.name}</p>
-          <h5>Batch {education}</h5>
-          <CustomButton onClick={() => setDropdownVisible(false)} title='Personal Details' icon = {faUser} to = '/alumni/personal' />
-          <CustomButton onClick={() => setDropdownVisible(false)} title='Educational Details' icon = {faUser} to = '/alumni/education' />
-          <CustomButton onClick={() => setDropdownVisible(false)} title='Employment Status' icon = {faUser} to = '/alumni/employment' />
+          <br/>
           <CustomButton onClick={() => setDropdownVisible(false)} title='Account Credentials' icon = {faUser} to = '/alumni/account' />
-          <CustomButton onClick={() => setDropdownVisible(false)} title='Alumni Status' icon = {faUser} to = '/alumni/status' />
-          <button onClick={signOutUser}>Logout</button>
+          <button style={{marginTop: 5}} onClick={signOutUser}>Logout</button>
         </div>
       )}
     </div>

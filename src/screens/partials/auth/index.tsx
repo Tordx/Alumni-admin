@@ -100,10 +100,10 @@ export default function Login({}) {
       <img draggable = {false} src="https://i.imgur.com/mzylrqX.png" alt="Your Image"/>
       <div className="image-overlay">
         <div className='login-box'>
-          <span className='image-container'>
+          {/* <span className='image-container'>
             <img className='logo' src ='https://i.imgur.com/4ywrjZF.png' />
             <img className='logo'  src='https://i.imgur.com/5CH306W.png'/>
-          </span>
+          </span> */}
           <h1>Admin Login</h1>
           <LoginFields 
             title = 'email address'

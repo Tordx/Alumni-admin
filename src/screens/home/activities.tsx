@@ -46,12 +46,13 @@ export default function Activities({}: Props) {
               key={index}>{item} </a>
           )}
         </div>
-        {data ? data.map((item, index) => (<Data callback={getdata} data={item} />)) : <CircularProgress />}
+        {data ? data.map((item, index) => (<Data callback={getdata} data={item} />)) :<Card>
+				<div className='data-container'><CircularProgress /> </div></Card>}
 
         </div>
       </div>
 
-      {!loading ? 
+      {!loading &&
         <Post
           callback={getdata}
           type = 'activities'
@@ -60,8 +61,6 @@ export default function Activities({}: Props) {
           closeModal={() => setvisible(false)} 
           setVisible = {setvisible}
           />
-      :
-      <CircularProgress />
       }     
       </div>
   )
