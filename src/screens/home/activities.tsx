@@ -1,19 +1,28 @@
 import { CircularProgress } from '@mui/material'
-import { fetchdata } from '../../firebase/function'
-import React, { useEffect } from 'react'
+import { fetchdata, fetchnewsletter } from '../../firebase/function'
+import React, { useEffect, useState } from 'react'
 import Card from 'screens/components/global/card'
 import Data from 'screens/contents/data'
 import Post from 'screens/contents/post'
 import { postdata } from 'types/interfaces'
+import emailjs from '@emailjs/browser';
 
 type Props = {}
 
+export interface emaildata {
+  uid: string,
+  email: string,
+  contact: string,
+}
 export default function Activities({}: Props) {
 
   const [data, setdata] = React.useState<postdata[]>([])
   const [visible, setvisible] = React.useState(false)
   const [loading, setloading] = React.useState(true)
   const [selectedschool, setselectedschool] = React.useState('KNHS')
+  const [email, setemail] = useState<string[]>([])
+  const [contact, setcontact] = React.useState<{ to: string }[]>([])
+
   const schools = ['KNHS', 'SCNHS']
   React.useEffect(() => {
    
@@ -27,11 +36,28 @@ export default function Activities({}: Props) {
     setdata(filterResult)
     console.log(filterResult)
     setloading(false)
+
+    const emailresult: emaildata[] = await fetchnewsletter('newsletter') || [];
+
+    // Filter and extract valid email addresses
+    const filteredEmails: string[] = emailresult
+      .filter((item) => item.email && item.email.includes('@')) // Remove items with empty or invalid email addresses
+      .map((item) => item.email);
+    const filteredContacts: { to: string }[] = emailresult
+      .filter((item) => item.contact && item.contact.startsWith('0') && item.contact.length === 11)
+      .map((item) => ({ to: item.contact }));
+
+    setcontact(filteredContacts)
+    console.log('Filtered Contacts:', filteredContacts)
+    console.log('Filtered Emails: ', filteredEmails);
+    setemail(filteredEmails)
   }
 
   const selectSchool = (item: string) => {
     setselectedschool(item)
   }
+
+
 
   return (
     <div className='container'>
@@ -60,6 +86,8 @@ export default function Activities({}: Props) {
           visible={() => setvisible(true)} 
           closeModal={() => setvisible(false)} 
           setVisible = {setvisible}
+          email={email}
+          contacts={contact}
           />
       }     
       </div>

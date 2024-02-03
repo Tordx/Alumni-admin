@@ -8,6 +8,7 @@ import {addDoc, collection, doc, setDoc} from '@firebase/firestore'
 import { db, storage } from '../../firebase/index'
 import { generateRandomKey } from '../../firebase/function'
 import { uploadBytes, getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import emailjs from '@emailjs/browser';
 
 type Props = {
 		closeModal: (e: any) => void,
@@ -16,11 +17,13 @@ type Props = {
 		type: string,
 		callback: () => void
 		setVisible: React.Dispatch<React.SetStateAction<boolean>>;
+		email: string[],
+		contacts: {to: string}[]
 }
 
 
 
-function Post({isModalVisible, visible, closeModal, type, callback, setVisible}: Props) {
+function Post({isModalVisible, visible, closeModal, type, callback, setVisible, email, contacts}: Props) {
 
 		const {currentUser} = useContext(AuthContext)
 		const [form, setform] = useState<postdata[]>(
@@ -29,7 +32,7 @@ function Post({isModalVisible, visible, closeModal, type, callback, setVisible}:
 					id: '',
 					uid: currentUser?.uid || '',
 					time: new Date(),
-					photo: [],
+					photo: '',
 					text: '',
 					active: true,
 					type: '',
@@ -38,6 +41,67 @@ function Post({isModalVisible, visible, closeModal, type, callback, setVisible}:
 			]
 		);
 
+		const getCurrentDay = () => {
+			const currentHour = new Date().getHours();
+			let greetingMessage = '';
+		
+			if (currentHour >= 5 && currentHour < 12) {
+			  greetingMessage = 'Good Morning';
+			} else if (currentHour >= 12 && currentHour < 17) {
+			  greetingMessage = 'Good Afternoon';
+			} else if (currentHour >= 17 && currentHour < 24) {
+			  greetingMessage = 'Good Evening';
+			}
+			return greetingMessage
+		  }
+		  const sendNotification = async() => {
+		   const result =  getCurrentDay();
+		   email.forEach(async (emailaddress: string) => {
+			emailjs.send('service_skjlv9o', 'template_9d5rn39', {
+				to_email: emailaddress,
+				to_name: result,
+				message: `${form[0].text} ${form[0].photo || ''}`,
+				from_name: `Alumni Tracking ${type}`,
+			  }, 'Nec51TUKm1JwG-0kC')
+				.then((result) => {
+				  console.log(result.text);
+				}, (error) => {
+				  console.log(error.text);
+				});
+		   })
+		 
+		  }
+	
+		  const sendSms = async () => {
+			const result =  getCurrentDay();
+			const requestOptions: any = {
+			  method: 'POST',
+			  headers: {
+				'Authorization': 'App 94fdca68c0215d82d132321a5919101e-61d40cb6-0637-4cc7-9411-e743a3002876',
+				'Content-Type': 'application/json',
+				'Accept': 'application/json',
+			  },
+			  body: JSON.stringify({
+				messages: [
+				  {
+					destinations: contacts,
+					from: 'Alumni Tracking',
+					text: `${result} New Post from alumni Tracking ${type}. \n ${form[0].text}`,
+				  }
+				],
+			  }),
+			  redirect: 'follow',
+			};
+	  
+			try {
+			  const response = await fetch("https://9l8j1y.api.infobip.com/sms/2/text/advanced", requestOptions);
+			  const result = await response.text();
+			  console.log(result);
+			} catch (error) {
+			  console.log('Error:', error);
+			}
+		  };
+	  
 
 	const submit = async () => {
     if (form[0].text !== '') {
@@ -45,7 +109,11 @@ function Post({isModalVisible, visible, closeModal, type, callback, setVisible}:
 			const id = generateRandomKey(25);
 			const formRef = doc(db, 'post', id);
 			const storageRef = ref(storage, 'images/' + form[0].photo.name);
-       if(form[0].photo != null){
+			await sendNotification().then(async() => {
+
+				await sendSms()
+       		if(form[0].photo != ''){
+
 				await uploadBytes(storageRef, form[0].photo);
     			const imageUrl = await getDownloadURL(storageRef);
 							await setDoc(formRef, {
@@ -64,7 +132,7 @@ function Post({isModalVisible, visible, closeModal, type, callback, setVisible}:
 								id: '',
 								uid: currentUser?.uid || '',
 								time: new Date(),
-								photo: null,
+								photo: '',
 								text: '',
 								active: true,
 								type: '',
@@ -91,7 +159,7 @@ function Post({isModalVisible, visible, closeModal, type, callback, setVisible}:
 							id: '',
 							uid: currentUser?.uid || '',
 							time: new Date(),
-							photo: null,
+							photo: '',
 							text: '',
 							active: true,
 							type: '',
@@ -101,6 +169,7 @@ function Post({isModalVisible, visible, closeModal, type, callback, setVisible}:
 				}
 				callback()
 				setVisible(false)
+			})
       } catch (error) {
         console.error('Error adding post:', error);
         // Handle the error appropriately

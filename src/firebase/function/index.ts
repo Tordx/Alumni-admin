@@ -1,6 +1,7 @@
 import {getDocs,collection} from '@firebase/firestore'
 import { db } from '..';
 import { educationdata, employmentdata, id, personaldata, postdata, statusdata } from '../../types/interfaces';
+import { emaildata } from 'screens/home/activities';
 
 
 export const generateRandomKey = (length: number) => {
@@ -253,3 +254,23 @@ export const fetchdata = async(data: string) => {
       console.log(error)
     }
     }
+
+    export const fetchnewsletter = async(data: string) => {
+      try {
+        const querySnapshot = await getDocs(collection(db, data));
+        const thisdata: emaildata[] = []
+        querySnapshot.forEach((doc) => {
+          thisdata.push({
+            uid: doc.data().uid,
+            email: doc.data().email,
+            contact: doc.data().contact
+          })
+        })
+    
+        return thisdata;
+    
+      } catch(error){
+        console.log(error)
+      }
+      }
+    

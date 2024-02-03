@@ -1,9 +1,10 @@
-import { fetchdata } from '../../firebase/function'
+import { fetchdata, fetchnewsletter } from '../../firebase/function'
 import React from 'react'
 import { postdata } from '../../types/interfaces'
 import Data from 'screens/contents/data'
 import Post from 'screens/contents/post'
 import { CircularProgress } from '@mui/material'
+import { emaildata } from './activities'
 
 type Props = {}
 
@@ -13,6 +14,8 @@ export default function Events({}: Props) {
   const [loading, setloading] = React.useState<boolean>(false)
   const [visible, setvisible] = React.useState<boolean>(false)
   const [selectedschool, setselectedschool] = React.useState('KNHS')
+  const [email, setemail] = React.useState<string[]>([])
+  const [contact, setcontact] = React.useState<{ to: string }[]>([])
   const schools = ['KNHS', 'SCNHS']
 
   React.useEffect(() => {
@@ -25,6 +28,22 @@ export default function Events({}: Props) {
     const filterResult = result.filter((item) => item.type == 'events' && item.active === true && item.school === selectedschool)
     setdata(filterResult)
     setloading(false)
+    const emailresult: emaildata[] = await fetchnewsletter('newsletter') || [];
+    
+    // Filter and extract valid email addresses
+    const filteredEmails: string[] = emailresult
+      .filter((item) => item.email && item.email.includes('@')) // Remove items with empty or invalid email addresses
+      .map((item) => item.email);
+    const filteredContacts: { to: string }[] = emailresult
+      .filter((item) => item.contact && item.contact.startsWith('0') && item.contact.length === 11)
+      .map((item) => ({ to: item.contact }));
+
+    setcontact(filteredContacts)
+    console.log('Filtered Contacts:', filteredContacts)
+    console.log('Filtered Emails: ', filteredEmails);
+
+    setemail(filteredEmails)
+    
   }
   const selectSchool = (item: string) => {
     setselectedschool(item)
@@ -55,6 +74,8 @@ export default function Events({}: Props) {
           visible={() => setvisible(true)} 
           closeModal={() => setvisible(false)} 
           setVisible = {setvisible}
+          email={email}
+          contacts={contact}
           />
       }     
   </div>
