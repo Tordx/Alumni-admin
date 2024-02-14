@@ -131,5 +131,6 @@ export interface admindata {
   photoURL: string,
   displayName: string,
   email: string,
+  school: string,
 }
 

@@ -42,6 +42,7 @@ export default function Data({data,callback}: Props) {
 					photoURL: doc.data().photoURL,
 					displayName: doc.data().displayName,
 					email: doc.data().email,
+					school: doc.data().school
         });
 				setuserdata(userData)
       }

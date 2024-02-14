@@ -9,6 +9,7 @@ import { db, storage } from '../../firebase/index'
 import { generateRandomKey } from '../../firebase/function'
 import { uploadBytes, getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import emailjs from '@emailjs/browser';
+var md5 = require('md5');
 
 type Props = {
 		closeModal: (e: any) => void,
@@ -18,12 +19,13 @@ type Props = {
 		callback: () => void
 		setVisible: React.Dispatch<React.SetStateAction<boolean>>;
 		email: string[],
-		contacts: {to: string}[]
+		contacts: number[]
+		school: string,
 }
 
 
 
-function Post({isModalVisible, visible, closeModal, type, callback, setVisible, email, contacts}: Props) {
+function Post({isModalVisible, visible, closeModal, type, callback, setVisible, email, contacts, school}: Props) {
 
 		const {currentUser} = useContext(AuthContext)
 		const [form, setform] = useState<postdata[]>(
@@ -36,20 +38,24 @@ function Post({isModalVisible, visible, closeModal, type, callback, setVisible, 
 					text: '',
 					active: true,
 					type: '',
-					school: 'KNHS'
+					school: school
 				}
 			]
 		);
+
+		React.useEffect(() => {
+			console.log(contacts.join(','))
+		},[])
 
 		const getCurrentDay = () => {
 			const currentHour = new Date().getHours();
 			let greetingMessage = '';
 		
-			if (currentHour >= 5 && currentHour < 12) {
+			if (currentHour >= 0 && currentHour < 12) {
 			  greetingMessage = 'Good Morning';
 			} else if (currentHour >= 12 && currentHour < 17) {
 			  greetingMessage = 'Good Afternoon';
-			} else if (currentHour >= 17 && currentHour < 24) {
+			} else if (currentHour >= 17 && currentHour < 23) {
 			  greetingMessage = 'Good Evening';
 			}
 			return greetingMessage
@@ -71,36 +77,73 @@ function Post({isModalVisible, visible, closeModal, type, callback, setVisible, 
 		   })
 		 
 		  }
-	
+
 		  const sendSms = async () => {
-			const result =  getCurrentDay();
-			const requestOptions: any = {
-			  method: 'POST',
-			  headers: {
-				'Authorization': 'App 94fdca68c0215d82d132321a5919101e-61d40cb6-0637-4cc7-9411-e743a3002876',
-				'Content-Type': 'application/json',
-				'Accept': 'application/json',
-			  },
-			  body: JSON.stringify({
-				messages: [
-				  {
-					destinations: contacts,
-					from: 'Alumni Tracking',
-					text: `${result} New Post from alumni Tracking ${type}. \n ${form[0].text}`,
-				  }
-				],
-			  }),
-			  redirect: 'follow',
+			const result = getCurrentDay()
+			const apiKey = "g3p3m8ht";
+			const appId = "lpoIXtmD";
+			const apiPwd = "lc71fV4F";
+			const url = 'https://api.onbuka.com/v3/sendSms';
+			const timestamp = Math.floor(Date.now() / 1000);
+			const sign = md5(apiKey + apiPwd +timestamp.toString());
+			const number = contacts.join(',');
+			console.log(sign)
+			console.log(timestamp);
+		  
+			const payload = {
+			  content: `${result}, New Alumni Tracking ${type.toLocaleUpperCase()} Update: \n ${form[0].text}`,
+			  numbers: number,
+			  appId: appId,
+			  senderId: "Alumni Tracking"
 			};
-	  
+		  
 			try {
-			  const response = await fetch("https://9l8j1y.api.infobip.com/sms/2/text/advanced", requestOptions);
-			  const result = await response.text();
-			  console.log(result);
+			  const response = await fetch(url, {
+				method: 'POST',
+				headers: {
+				  'Content-Type': 'application/json;charset=UTF-8',
+				  'Api-Key': apiKey,
+				  'Sign': sign,
+				  'Timestamp': timestamp.toString()
+				},
+				body: JSON.stringify(payload)
+			  })
+			  const responseData = await response.json();
+			  console.log(responseData);
 			} catch (error) {
-			  console.log('Error:', error);
+			  console.error(error);
 			}
 		  };
+	
+		//   const sendSms = async () => {
+		// 	const result =  getCurrentDay();
+		// 	const requestOptions: any = {
+		// 	  method: 'POST',
+		// 	  headers: {
+		// 		'Authorization': 'App 94fdca68c0215d82d132321a5919101e-61d40cb6-0637-4cc7-9411-e743a3002876',
+		// 		'Content-Type': 'application/json',
+		// 		'Accept': 'application/json',
+		// 	  },
+		// 	  body: JSON.stringify({
+		// 		messages: [
+		// 		  {
+		// 			destinations: contacts,
+		// 			from: 'Alumni Tracking',
+		// 			text: `${result} New Post from alumni Tracking ${type}. \n ${form[0].text}`,
+		// 		  }
+		// 		],
+		// 	  }),
+		// 	  redirect: 'follow',
+		// 	};
+	  
+		// 	try {
+		// 	  const response = await fetch("https://9l8j1y.api.infobip.com/sms/2/text/advanced", requestOptions);
+		// 	  const result = await response.text();
+		// 	  console.log(result);
+		// 	} catch (error) {
+		// 	  console.log('Error:', error);
+		// 	}
+		//   };
 	  
 
 	const submit = async () => {
@@ -136,7 +179,7 @@ function Post({isModalVisible, visible, closeModal, type, callback, setVisible, 
 								text: '',
 								active: true,
 								type: '',
-								school: 'KNHS',
+								school: school,
 							},
 						]);
 				callback()
@@ -163,7 +206,7 @@ function Post({isModalVisible, visible, closeModal, type, callback, setVisible, 
 							text: '',
 							active: true,
 							type: '',
-							school: 'KNHS',
+							school: form[0].school,
 						},
 					]);
 				}
@@ -190,21 +233,6 @@ function Post({isModalVisible, visible, closeModal, type, callback, setVisible, 
 							<Card className='form-wrapper post'>
 								<div className='form-container'>
 								<h1>Create Post</h1>
-								<Select
-									placeholder='Select a school'
-									value={form[0].school}
-									onChange={(e) => {
-										console.log(e.target.value)
-										setform((prev) => [
-									{
-										...prev[0],
-										school: e.target.value
-									},
-									])}}
-									selection={['KNHS', 'SCNHS']}
-									title = 'Select School'
-									icon={faChevronRight}
-								/>
 								<LoginFields
 									type='file'
 									title='Upload a photo'

@@ -52,54 +52,53 @@ const Table: React.FC = () => {
   const handlePrint = () => {
     // Open a new window for printing
     const printWindow = window.open('', '_blank');
-  
+    
     if (printWindow) {    
       const printContent = `
-      <html>
-        <head>
-          <title>${receivedData.title} - All Data</title>
-        </head>
-        <body>
-          <h1>${receivedData.title}</h1>
-          <p>Total No. of Alumni: ${receivedData.data.length}</p>
-          <table style="border-collapse: collapse; width: 100%;">
-            <thead>
-              ${headerGroups.map((headerGroup: any) => `
-                <tr>
-                  ${headerGroup.headers.map((column: any) => `
-                    <th style="background-color: #2F5288; color: white; padding: 10px; width: 100px;">
-                      ${column.render('Header')}
-                    </th>`).join('')}
+        <html>
+          <head>
+            <title>${receivedData.title} - All Data</title>
+          </head>
+          <body>
+            <h1>${receivedData.title}</h1>
+            <p>Total No. of Alumni: ${receivedData.data.length}</p>
+            <table style="border-collapse: collapse; width: 100%;">
+              <thead>
+                ${headerGroups.map((headerGroup: any) => `
+                  <tr>
+                    ${headerGroup.headers.map((column: any) => `
+                      <th style="background-color: #2F5288; color: white; padding: 10px; width: 100px;">
+                        ${column.render('Header')}
+                      </th>`).join('')}
+                  </tr>`).join('')}
+              </thead>
+              <tbody>
+                ${receivedData.data.map((row: any, rowIndex: number) => `
+                <tr style="background-color: ${rowIndex % 2 === 0 ? '#ECF1F7' : '#FFFF'};">
+                  ${columns.map((column: any) => `
+                    <td style="padding: 10px; color: #2F5288; font-size: 14px;">
+                      ${row[column.accessor] !== undefined && row[column.accessor] !== null ? (typeof row[column.accessor] === 'object' ? JSON.stringify(row[column.accessor]) : row[column.accessor]) : ''}
+                    </td>`).join('')}
                 </tr>`).join('')}
-            </thead>
-            <tbody>
-              ${page.map((row: any, rowIndex: number) => `
-              <tr style="background-color: ${rowIndex % 2 === 0 ? '#ECF1F7' : '#FFFF'};">
-                ${row.cells.map((cell: any) => `
-                  <td style="padding: 10px; color: #2F5288; font-size: 14px;">
-                    ${cell.value !== undefined && cell.value !== null ? (typeof cell.value === 'object' ? JSON.stringify(cell.value) : cell.value) : ''}
-                  </td>`).join('')}
-              </tr>`).join('')}
-            </tbody>
-            </tbody>
-            </tbody>
-          </table>
-        </body>
-      </html>
-    `;
-  
-    // Write the content to the new window
-    printWindow.document.write(printContent);
-  
-    // Close the document for further writing
-    printWindow.document.close();
-  
-    // Call the print function
-    printWindow.print();
-  } else {
-    alert('No document to print')
+              </tbody>
+            </table>
+          </body>
+        </html>
+      `;
+    
+      // Write the content to the new window
+      printWindow.document.write(printContent);
+    
+      // Close the document for further writing
+      printWindow.document.close();
+    
+      // Call the print function
+      printWindow.print();
+    } else {
+      alert('No document to print')
+    }
   }
-  }
+  
   
 
   return (

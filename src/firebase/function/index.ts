@@ -1,6 +1,6 @@
 import {getDocs,collection} from '@firebase/firestore'
 import { db } from '..';
-import { educationdata, employmentdata, id, personaldata, postdata, statusdata } from '../../types/interfaces';
+import { admindata, educationdata, employmentdata, id, personaldata, postdata, statusdata } from '../../types/interfaces';
 import { emaildata } from 'screens/home/activities';
 
 
@@ -36,6 +36,26 @@ export const fetchdata = async(data: string) => {
   } catch(error){
     console.log(error)
   }
+  }
+
+  export const fetchadmindata = async(uid: string) => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'user'));
+        const thisdata: admindata[] = []
+        querySnapshot.forEach((doc) => {
+          if(doc.data().uid === uid)
+          thisdata.push({
+          uid: doc.data().uid,
+          photoURL: doc.data().photoURL,
+          displayName: doc.data().displayName,
+          email: doc.data().email,
+          school: doc.data().school,
+          })
+        })
+        return thisdata
+    } catch (error) {
+      throw error;
+    }
   }
 
   export const fetchpersonaldata = async(uid: string,) => {

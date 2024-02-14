@@ -1,4 +1,4 @@
-import { faChevronRight, faEnvelope, faLock, faUser } from '@fortawesome/free-solid-svg-icons'
+import { faChevronRight, faEnvelope, faEye, faIdCard, faIdCardClip, faLock, faUser } from '@fortawesome/free-solid-svg-icons'
 import { AuthContext } from 'auth'
 import React, { useContext, useState } from 'react'
 import Card from 'screens/components/global/card'
@@ -218,6 +218,7 @@ function AddNewAccount({isModalVisible, visible, closeModal, type, callback}: Pr
 							<Card className='form-wrapper post'>
 								<div className='form-container'>
 								<h1>Add New account</h1>
+                                <h4>mass account creation</h4>
                                 <input
                                     type='file'
                                     accept='.csv'
@@ -230,6 +231,7 @@ function AddNewAccount({isModalVisible, visible, closeModal, type, callback}: Pr
                                     Upload CSV and Create Accounts
                                     </button>
                                 )}
+                                <br/>
 								<Select
 									placeholder='Select a school'
 									value={selectedschool}
@@ -349,7 +351,7 @@ function AddNewAccount({isModalVisible, visible, closeModal, type, callback}: Pr
                                 <LoginFields 
                                     title='School id*'
                                     type  ='text'
-                                    icon = {faEnvelope}
+                                    icon = {faIdCardClip}
                                     disabled = {false}
                                     onChange={(e) => setschoolid(e.target.value)}
                                     placeholder= 'school id' 
@@ -358,7 +360,7 @@ function AddNewAccount({isModalVisible, visible, closeModal, type, callback}: Pr
                                 <LoginFields 
                                     title='Temporary Password'
                                     type  ='text'
-                                    icon = {faEnvelope}
+                                    icon = {faEye}
                                     disabled = {true}
                                     placeholder={temppassword}
                                     value= {temppassword} 

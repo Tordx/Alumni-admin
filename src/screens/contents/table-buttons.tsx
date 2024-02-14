@@ -29,10 +29,11 @@ function TableButtons({onClick}: Props) {
 
         const employmentResult: employmentdata[] = await fetchallemployment() || [];
         setEmployment(employmentResult);
-        const updateResult: id[] = await fetchupdate() || [];
         
+        const updateResult: id[] = await fetchupdate() || [];
+        console.log(updateResult)
         const processedUpdate = updateResult.map(item => {
-          // Convert the timestamp to a JavaScript Date object
+          console.log(item)
           const timestampInSeconds = item.date.seconds;
           const timestampInMilliseconds = timestampInSeconds * 1000; // Convert seconds to milliseconds
           const dateObject = new Date(timestampInMilliseconds);
@@ -54,10 +55,14 @@ function TableButtons({onClick}: Props) {
         console.log(processedUpdate)
         const updateWithoutDate = processedUpdate.map(({ date, ...rest }) => rest);
         setUpdate(updateWithoutDate);
+        console.log(updateWithoutDate)
+
         const uidMap: Record<string, string> = {};
+
         personalResult.forEach((person) => {
           uidMap[person.uid] = person.name;
         });
+
         setUidToFullNameMap(uidMap);
       } catch (error) {
         console.error(error)
@@ -82,9 +87,11 @@ function TableButtons({onClick}: Props) {
   }));
 
   const updateDataWithFullName = update.map((emp) => ({
+    
     ...emp,
     fullname: uidToFullNameMap[emp.uid],
   }));
+
 
   const updateEmploymentState = () => {
       setEmployment(employmentDataWithFUllNames)
@@ -94,6 +101,8 @@ function TableButtons({onClick}: Props) {
   };
 
   const updateUpdateState = () => {
+    console.log(updateDataWithFullName)
+
     setUpdate(updateDataWithFullName);
   };
 

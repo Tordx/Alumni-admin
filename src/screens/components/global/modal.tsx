@@ -8,7 +8,6 @@ type Props = {
 }
 
 const Modal = ({ isOpen, onClose, imageSrc }: Props) => {
-    console.log('IMAGE SOURCE:' + imageSrc)
   return (
     <>
       {isOpen && (
