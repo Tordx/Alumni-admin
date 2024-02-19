@@ -41,7 +41,7 @@ const Table: React.FC = () => {
     {
       columns,
       data: receivedData.data,
-      initialState: { pageIndex: 0, pageSize: 5 } as any,
+      initialState: { pageIndex: 0, pageSize: 10 } as any,
     },
 
     useGlobalFilter,

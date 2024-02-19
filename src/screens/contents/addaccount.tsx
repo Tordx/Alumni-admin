@@ -4,8 +4,8 @@ import React, { useContext, useState } from 'react'
 import Card from 'screens/components/global/card'
 import { LoginFields, Select, TextField } from 'screens/components/global/fields'
 import { personaldata, postdata } from 'types/interfaces'
-import {addDoc, collection, setDoc, doc} from '@firebase/firestore'
-import { auth, db, storage } from '../../firebase/index'
+    import {addDoc, collection, setDoc, doc} from '@firebase/firestore'
+    import { auth, db, storage } from '../../firebase/index'
 import { generateRandomKey } from '../../firebase/function'
 import { uploadBytes, getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import {createUserWithEmailAndPassword} from 'firebase/auth'
@@ -48,6 +48,7 @@ function AddNewAccount({isModalVisible, visible, closeModal, type, callback}: Pr
                     age:  '',
                     sex:  '',
                     address:  '',
+                    school: '',
                     sy: '',
 				}
 			]
@@ -162,6 +163,7 @@ function AddNewAccount({isModalVisible, visible, closeModal, type, callback}: Pr
                     email: form[0].email || form[0].fullname.lastname + schoolid + '@' + form[0].fullname.lastname + schoolid + '.qwe',
                     sex: form[0].sex,
                     school: selectedschool,
+                    schoolid: schoolid,
                     type: 'alumni'
 
             });
@@ -185,6 +187,7 @@ function AddNewAccount({isModalVisible, visible, closeModal, type, callback}: Pr
                         age:  '',
                         sex:  '',
                         address:  '',
+                        school: '',
                         sy: '',
                     },
                 ]);
@@ -355,7 +358,7 @@ function AddNewAccount({isModalVisible, visible, closeModal, type, callback}: Pr
                                     disabled = {false}
                                     onChange={(e) => setschoolid(e.target.value)}
                                     placeholder= 'school id' 
-                                    value= {form[0].email} 
+                                    value= {schoolid} 
                                 />
                                 <LoginFields 
                                     title='Temporary Password'

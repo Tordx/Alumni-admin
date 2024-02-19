@@ -19,6 +19,7 @@ export default function Employment({}: Props) {
         employee: '',
         currentwork: '',
         salary: '',
+        school: '',
         history: {
           uid: '',
           work: '',
@@ -42,6 +43,7 @@ export default function Employment({}: Props) {
           employee: result[0].employee || '',
           currentwork: result[0].currentwork || '',
           salary: result[0].salary || '',
+          school: result[0].school || '',
           history: {
             uid: result[0].history.uid || '',
             work: result[0].history.work || '',
@@ -83,6 +85,7 @@ export default function Employment({}: Props) {
                   employee: form[0].employee,
                   currentwork: form[0].currentwork,
                   salary: form[0].salary,
+                  school: form[0].school,
                   history: {
                     uid: form[0].history.uid,
                     work: form[0].history.work,

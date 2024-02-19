@@ -90,7 +90,7 @@ function Post({isModalVisible, visible, closeModal, type, callback, setVisible, 
 			console.log(sign)
 			console.log(timestamp);
 		  
-			const payload = {
+			const payload = {	
 			  content: `${result}, New Alumni Tracking ${type.toLocaleUpperCase()} Update: \n ${form[0].text}`,
 			  numbers: number,
 			  appId: appId,

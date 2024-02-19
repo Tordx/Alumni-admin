@@ -77,6 +77,7 @@ export const fetchdata = async(data: string) => {
           sex: doc.data().sex,
           address: doc.data().address,
           sy: doc.data().sy,
+          school: doc.data().school
         })
       })
   
@@ -127,6 +128,7 @@ export const fetchdata = async(data: string) => {
           currentwork: doc.data().current,
           salary: doc.data().salary,
           history: doc.data().uid, 
+          school: doc.data().school
         })
       })
       return thisdata
@@ -170,6 +172,7 @@ export const fetchdata = async(data: string) => {
           currentwork: doc.data().current,
           salary: doc.data().salary,
           history: doc.data().uid, 
+          school: doc.data().school
         })
       })
       return thisdata
@@ -192,6 +195,7 @@ export const fetchdata = async(data: string) => {
           currentwork: doc.data().current,
           salary: doc.data().salary,
           history: doc.data().history, 
+          school: doc.data().school
         })
       })
       return thisdata
@@ -246,6 +250,7 @@ export const fetchdata = async(data: string) => {
           sex: doc.data().sex,
           address: doc.data().address,
           sy: doc.data().sy,
+          school: doc.data().school
         })
       })
   

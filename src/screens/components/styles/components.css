@@ -499,4 +499,25 @@
     font-size: 10px;
   }
   
+  
+}
+
+.print-button {
+  display: flex;
+  width: 125px;
+  margin-left: 30px;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+@media print {
+  .print-button {
+    display: none;
+  }
+  .table-buttons-container {
+    display: none;
+  }
+  .header {
+    display: none;
+  }
 }

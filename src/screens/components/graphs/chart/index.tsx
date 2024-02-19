@@ -1,6 +1,8 @@
 import { BarChart } from '@mui/x-charts';
 import React from 'react';
 import { salaryRange } from '../../constants/salaryrange';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPrint } from '@fortawesome/free-solid-svg-icons';
 
 type Props = {
   chartdata: string[]; // Assuming chartdata is an array of numbers representing salaries
@@ -33,9 +35,18 @@ const processChartData = (chartdata: string[]): number[] => {
 const BoxChart = ({ chartdata }: Props) => {
   const processedData = processChartData(chartdata);
 
+  const handlePrint = () => {
+    window.print();
+  };
+
+
   return (
     <div className='chart-container'>
       <h1>Alumni Income Per Bracket</h1>
+      <div className='print-button' onClick={handlePrint}>
+        <FontAwesomeIcon icon={faPrint} />
+        <span>Print Analytics</span>
+      </div>
       <BarChart
         xAxis={[{ scaleType: 'band', data: salaryRange }]}
         width={750}

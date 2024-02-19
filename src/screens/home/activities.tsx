@@ -54,9 +54,8 @@ export default function Activities({}: Props) {
 
     const emailresult: emaildata[] = await fetchnewsletter('newsletter') || [];
 
-    // Filter and extract valid email addresses
     const filteredEmails: string[] = emailresult
-      .filter((item) => item.email && item.email.includes('@')) // Remove items with empty or invalid email addresses
+      .filter((item) => item.email && item.email.includes('@'))
       .map((item) => item.email);
       const filteredContacts: number[] = emailresult
       .filter((item) => item.contact && item.contact.startsWith('0') && item.contact.length === 11)
@@ -67,6 +66,8 @@ export default function Activities({}: Props) {
     console.log('Filtered Emails: ', filteredEmails);
     setemail(filteredEmails)
   }
+
+
 
   return (
     <div className='container'>

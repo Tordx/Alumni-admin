@@ -1,10 +1,11 @@
-import { fetchalleducation, fetchallemployment, fetchallpersonalinfo, fetchupdate } from '../../firebase/function';
+import { fetchadmindata, fetchalleducation, fetchallemployment, fetchallpersonalinfo, fetchupdate } from '../../firebase/function';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TableButton } from 'screens/components/global/buttons';
 import Card from 'screens/components/global/card';
 import { LoginFields } from 'screens/components/global/fields';
-import { educationdata, employmentdata, id, idprocessed, personaldata } from '../../types/interfaces';
+import { admindata, educationdata, employmentdata, id, idprocessed, personaldata } from '../../types/interfaces';
+import { AuthContext } from 'auth';
 
 type Props = {
   onClick: (e: any) => void
@@ -17,18 +18,25 @@ function TableButtons({onClick}: Props) {
   const [employment, setEmployment] = React.useState<employmentdata[]>([]);
   const [update, setUpdate] = React.useState<idprocessed[]>([]);
   const [uidToFullNameMap, setUidToFullNameMap] = React.useState<Record<string, string>>({});
-
+  const {currentUser} =  React.useContext(AuthContext)
   React.useEffect(() => {
     const fetchData = async () => {
       try {
+        const fetchuser: admindata[] = await fetchadmindata(currentUser?.uid || '') || [];
+        const userschool = fetchuser[0].school
         const personalResult: personaldata[] = await fetchallpersonalinfo() || [];
-        setPersonal(personalResult);
+        const filterpersonalResult = personalResult.filter((item) => item.school == userschool)
+        setPersonal(filterpersonalResult);
 
         const educationResult: educationdata[] = await fetchalleducation() || [];
-        setEducation(educationResult);
+        const filtereducationResult = educationResult.filter((item) => item.school == userschool)
+
+        setEducation(filtereducationResult);
 
         const employmentResult: employmentdata[] = await fetchallemployment() || [];
-        setEmployment(employmentResult);
+        const filteremploymentResult = employmentResult.filter((item) => item.school == userschool)
+
+        setEmployment(filteremploymentResult);
         
         const updateResult: id[] = await fetchupdate() || [];
         console.log(updateResult)
@@ -59,7 +67,7 @@ function TableButtons({onClick}: Props) {
 
         const uidMap: Record<string, string> = {};
 
-        personalResult.forEach((person) => {
+        filterpersonalResult.forEach((person) => {
           uidMap[person.uid] = person.name;
         });
 

@@ -25,6 +25,7 @@ export interface personaldata {
   sex: string,
   address: string,
   sy: string,
+  school: string,
 
 }
 
@@ -67,6 +68,7 @@ export interface employmentdata {
   currentwork: string,
   salary: string,
   history: historydetails,
+  school: string,
 
 }
 
